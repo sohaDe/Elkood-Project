@@ -1,0 +1,100 @@
+<div class="card shadow border-0" [ngClass]="{
+  'border-warning': bookingType === BookingType.WalkIn 
+                    || bookingType === BookingType.Emergency,
+  'border-blue': bookingType === BookingType.Scheduled
+}">
+
+  <div class="card-header d-flex align-items-center justify-content-between p-3 form-header">
+    <h5 class="mb-0">
+      <i class="bi bi-person-plus-fill me-2"></i>
+      New Appointment
+    </h5>
+  </div>
+
+  <div class="card-body p-4">
+    <form [formGroup]="patientForm" (ngSubmit)="onSubmit()" (keydown.enter)="$event.preventDefault()">
+
+      <div class="row">
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-bold" for="patientName">Patient Name</label>
+          <input type="text" id="patientName" name="patientName" formControlName="name" class="form-control shadow-sm"
+            [class.is-invalid]="patientForm.get('name')?.touched && patientForm.get('name')?.invalid"
+            placeholder="Full name">
+          <div class="invalid-feedback">
+            @if (patientForm.get('name')?.errors?.['required']){
+            <span>
+              Name is required
+            </span>
+            }
+            @if (patientForm.get('name')?.errors?.['minlength']){
+            <span>
+              Name must be at least 3 characters
+            </span>
+            }
+          </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-bold" for="phone">Phone Number</label>
+          <input type="text" id="patientPhone" name="patientPhone" formControlName="phone" maxlength="10"
+            class="form-control shadow-sm" placeholder="09xxxxxxxx" (input)="onPhoneInput($event)"
+            [class.is-invalid]="patientForm.get('phone')?.touched && patientForm.get('phone')?.invalid">
+
+          @if (patientForm.get('phone')?.touched && patientForm.get('phone')?.invalid){
+          <div class="invalid-feedback">
+            Phone number must be 10 digits
+          </div>
+          }
+
+        </div>
+
+
+        <div class="col-md-4 mb-3">
+          <label class="form-label fw-bold" for="bloodType">Blood Type</label>
+          <select id="bloodType" name="bloodType" formControlName="bloodType" class="form-select shadow-sm">
+            <option value="">Select..</option>
+            @for (type of ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-']; track type) {
+            <option [value]="type">
+              {{ type }}
+            </option>
+            }
+          </select>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label class="form-label fw-bold" for="bookingType">Booking Type</label>
+          <select id="bookingType" name="bookingType" formControlName="bookingType" class="form-select shadow-sm">
+            <option [value]="BookingType.Scheduled">Scheduled</option>
+            <option [value]="BookingType.WalkIn">Walk-in</option>
+            <option [value]="BookingType.Emergency">Emergency</option>
+          </select>
+        </div>
+
+        @if (patientForm.get('bookingType')?.value === BookingType.Scheduled) {
+        <div class="col-md-4 mb-3">
+          <label class="form-label fw-bold" for="bookingDate">Date</label>
+          <input type="datetime-local" [min]="minDateTime" formControlName="bookingDate"
+            class="form-control shadow-sm border-2 animate__animated animate__fadeInDown">
+        </div>
+        }
+
+      </div>
+
+      <button type="submit" [disabled]="patientForm.invalid || isSubmitting"
+        class="btn btn-primary w-100 py-2 mt-3 fw-bold shadow">
+        @if (!isSubmitting) {
+        <span>Add Booking</span>
+        }
+        @if (isSubmitting) {
+        <span>
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          Saving...
+        </span>
+        }
+
+      </button>
+
+    </form>
+  </div>
+</div>

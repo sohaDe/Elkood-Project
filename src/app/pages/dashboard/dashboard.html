@@ -1,0 +1,144 @@
+<app-header [showForm]="showForm" (toggleForm)="toggleForm()">
+</app-header>
+
+<div class="container mt-4">
+  @if (showForm || isClosing) {
+  <app-add-patient class="mb-5 d-block animate__animated" [ngClass]="showForm ? 'animate__zoomIn' : 'animate__zoomOut'"
+    (formSubmitted)="onFormSubmitted($event)">
+  </app-add-patient>
+  }
+
+</div>
+
+
+<div class="container-fluid mt-4">
+  <div class="row g-4">
+    <div class="col-md-4 animate__animated animate__fadeInLeft">
+      <div class="status-column p-3 rounded shadow-sm bg-light border-top border-primary border-5">
+        <h5 class="mb-3 d-flex justify-content-between">
+          Incoming Patients <span class="badge bg-primary">{{incomingPatients.length}}</span>
+        </h5>
+
+
+        @for (p of incomingPatients; track p.id) {
+        <app-patient-card (viewDetails)="openDetails($event)" [patient]="p" mode="incoming" (arrive)="onArrive($event)"
+          (cancel)="onCancel($event)">
+        </app-patient-card>
+        }
+
+        @if (incomingPatients.length === 0) {
+        <div class="text-muted text-center py-5">
+          <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+          No incoming patients
+        </div>
+        }
+
+      </div>
+    </div>
+
+    <div class="col-md-4 animate__animated animate__fadeInUp">
+      <div class="status-column p-3 rounded shadow-sm bg-light border-top border-warning border-5">
+        <h5 class="mb-3 d-flex justify-content-between">
+          Waiting <span class="badge bg-warning text-dark">{{waitingPatients.length}}</span>
+        </h5>
+
+        @for (p of waitingPatients; track p.id) {
+        <app-patient-card (viewDetails)="openDetails($event)" [patient]="p" mode="waiting" (treat)="onTreat($event)">
+        </app-patient-card>
+        }
+
+
+        @if (waitingPatients.length === 0) {
+        <div class="py-5 text-muted text-center">
+          <i class="bi bi-hourglass-split fs-2 d-block mb-2"></i>
+          No waiting patients
+        </div>
+        }
+      </div>
+    </div>
+
+    <div class="col-md-4 animate__animated animate__fadeInRight">
+      <div class="status-column p-3 rounded shadow-sm bg-white border-top border-success border-5 text-center h-100">
+        <h5 class="mb-4 text-success">Current Patient</h5>
+
+        @if (currentPatient; as patient) {
+        <div class="current-patient-area animate__animated animate__pulse animate__infinite">
+          <div class="avatar-circle mx-auto bg-success text-white mb-3" (click)="openDetails(patient)">
+            {{ patient.name.charAt(0) }}
+          </div>
+          <h4>{{ patient.name }}</h4>
+          <p class="text-muted">{{ patient.phone }} | Blood Type: {{ patient.bloodType }}</p>
+          <div class="d-flex flex-column align-items-center justify-content-center">
+            <div class="badge bg-success p-2">Being treated now...</div>
+            <button class="btn btn-outline-success mt-3" (click)="finishCurrentPatient(patient.id)">
+              Finish Treatment
+            </button>
+          </div>
+        </div>
+        }
+
+        @if (!currentPatient) {
+        <div class="py-5 text-muted">
+          <i class="bi bi-person-x fs-2 d-block mb-2"></i>
+          No patient currently being treated
+        </div>
+        }
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="treatedPatients">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">Treated Patients</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+  </div>
+
+  <div class="offcanvas-body">
+    @if (treatedPatients.length === 0) {
+    <div class="text-muted text-center">
+      No treated patients yet
+    </div>
+    }
+
+    @for (p of treatedPatients; track p.id) {
+    <div class="card mb-2 shadow-sm">
+      <div class="card-body">
+        <h6>{{p.name}}</h6>
+        <div class="d-flex justify-content-between align-items-center">
+
+          <small class="text-muted">
+            {{ p.treatedAt | date:'yyyy/MM/dd - HH:mm' }}
+          </small>
+
+          <button class="btn btn-sm btn-outline-secondary p-0" (click)="openDetails(p)" title="View Details">
+            <i class="bi bi-exclamation-lg"></i>
+          </button>
+
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+</div>
+
+
+<div class="toast-container position-fixed top-0 end-0 p-3">
+  <div class="toast text-bg-success border-0 shadow-lg" [ngClass]="{
+        'show animate__animated animate__fadeInUp': showToast,
+        'hide': !showToast
+      }">
+    <div class="d-flex align-items-center">
+      <div class="toast-body fw-bold">
+        Booking added successfully
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (selectedPatient){
+<app-patient-details-modal [patient]="selectedPatient" (close)="closeDetails()">
+</app-patient-details-modal>
+}
