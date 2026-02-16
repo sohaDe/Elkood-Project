@@ -1,5 +1,14 @@
 # DentalClinic
 
+Simple front-end app for managing clinic appointments and patient flow.
+
+## Features
+- Add patient bookings (Scheduled / Walk-in / Emergency)
+- Waiting list & treatment queue
+- Cancel scheduled bookings
+- Form validation
+- Responsive UI
+
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.1.
 
 ## Development server
